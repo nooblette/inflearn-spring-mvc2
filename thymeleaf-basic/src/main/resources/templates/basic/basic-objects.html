@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>식 기본 객체 (Expression Basic Objects)</h1> <ul>
+        <li>request = <span th:text="${request}"></span></li>
+        <li>response = <span th:text="${response}"></span></li>
+        <li>session = <span th:text="${session}"></span></li>
+        <li>servletContext = <span th:text="${servletContext}"></span></li>
+        <li>locale = <span th:text="${#locale}"></span></li>
+    </ul>
+    <h1>편의 객체</h1>
+    <ul>
+        <!-- ${param.paramData} : HTTP 요청의 request parameter value 값에 바로 접근-->
+        <li>Request Parameter = <span th:text="${param.paramData}"></span></li>
+
+        <!-- ${session.sessionData} : session에 담아둔 데이터를 바로 조회-->
+        <li>session = <span th:text="${session.sessionData}"></span></li>
+
+        <!-- ${@helloBean.hello('Spring!')} : 타임리프에서 'helloBean' 이름으로 등록된 스프링 빈(Spring Bean)에 접근하여 hello() 메서드를 호출 -->
+        <li>spring bean = <span th:text="${@helloBean.hello('Spring!')}"></span></li>
+    </ul>
+</body>
+</html>
