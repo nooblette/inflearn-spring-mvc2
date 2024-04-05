@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>부분 포함</h1>
+<h2>부분 포함 insert</h2>
+<!-- th:insert="~{경로 :: 이름}" : 경로에서 이름에 해당하는 템플릿 조각을 가져다가 집어넣는다.-->
+<div th:insert="~{template/fragment/footer :: copy}"></div>
+
+<h2>부분 포함 replace</h2>
+<!-- th:replace="~{경로 :: 이름}" : 경로에서 이름에 해당하는 템플릿 조각을 가져다가 div 태그를 대체한다(div 태그 자체가 사라진다).-->
+<div th:replace="~{template/fragment/footer :: copy}"></div>
+
+<h2>부분 포함 단순 표현식</h2>
+<div th:replace="template/fragment/footer :: copy"></div>
+
+<h1>파라미터 사용</h1>
+<div th:replace="~{template/fragment/footer :: copyParam ('데이터1', '데이터2')}"></div>
+</body>
+</html>
