@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- 자바스크립트 인라인 사용 전 -->
+<script>
+    var username = [[${user.username}]];
+    var age = [[${user.age}]];
+
+    //자바스크립트 내추럴 템플릿
+    var username2 = /*[[${user.username}]]*/ "test username";
+
+    //객체
+    var user = [[${user}]]; // user.toString() 호출
+</script>
+
+<!-- 자바스크립트 인라인 사용 후 -->
+<script th:inline="javascript">
+    var username = [[${user.username}]]; // 자바스크립트가 username 값을 문자로 처리해준다(""로 감싼다)
+    var age = [[${user.age}]];
+
+    // 자바스크립트 내추럴 템플릿
+    var username2 = /*[[${user.username}]]*/ "test username"; // "test username"은 렌더링할때 지우고 user.username 값을 사용한다. (실제 html 파일을 직접 실행하면 그대로 렌더링)
+
+    // 객체
+    var user = [[${user}]]; // 객체를 json 형태로 바꿔서 렌더링한다. ({"username":"userA","age":10})
+</script>
+
+<!-- 자바스크립트 인라인 each -->
+<script th:inline="javascript">
+    [# th:each="user, stat : ${users}"]
+    var user[[${stat.count}]] = [[${user}]];
+    [/]
+</script>
+</body>
+</html>
