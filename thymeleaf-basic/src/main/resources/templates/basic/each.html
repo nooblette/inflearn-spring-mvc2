@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<h1>기본 테이블</h1>
+<table border="1">
+  <tr>
+    <th>username</th>
+    <th>age</th>
+  </tr>
+  <!-- th:each - users 리스트의 원소들을 순서대로 조회하여 그 값을 user 변수에 세팅-->
+  <tr th:each="user : ${users}">
+    <!-- user 변수의 username과 age 값을 프로퍼티 접근법(getter 호출)으로 조회한다.-->
+    <td th:text="${user.username}">username</td>
+    <td th:text="${user.age}">0</td>
+  </tr>
+</table>
+<h1>반복 상태 유지</h1>
+<table border="1">
+  <tr>
+    <th>count</th>
+    <th>username</th>
+    <th>age</th>
+    <th>etc</th>
+  </tr>
+  <!-- th:each - 첫 번째 값(user)에는 컬렉션의 원소에 대한 값이, 두 번째 값(userStat)에는 현재 루프에 대한 상태(index, count 등)를 알려준다.-->
+  <tr th:each="user, userStat : ${users}">
+    <td th:text="${userStat.count}">username</td>
+    <td th:text="${user.username}">username</td>
+    <td th:text="${user.age}">0</td>
+    <td>
+      index = <span th:text="${userStat.index}"></span>
+      count = <span th:text="${userStat.count}"></span>
+      size = <span th:text="${userStat.size}"></span>
+      even? = <span th:text="${userStat.even}"></span>
+      odd? = <span th:text="${userStat.odd}"></span>
+      first? = <span th:text="${userStat.first}"></span>
+      last? = <span th:text="${userStat.last}"></span>
+      current = <span th:text="${userStat.current}"></span>
+    </td> </tr>
+</table>
+</body>
+</html>
