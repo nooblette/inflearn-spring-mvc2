@@ -32,7 +32,9 @@ public class FormItemController {
     }
 
     @GetMapping("/add")
-    public String addForm() {
+    public String addForm(Model model) {
+        // 타임리프에서 제공하는 기능을 폼 기능을 사용하려면 Model 객체로 item 객체를 넘겨주어야 한다. (비어있는 item 객체라도 넘겨준다)
+        model.addAttribute("item", new Item());
         return "form/addForm";
     }
 
@@ -47,6 +49,8 @@ public class FormItemController {
     @GetMapping("/{itemId}/edit")
     public String editForm(@PathVariable Long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
+
+        // model에 담긴 item 객체를 타임리프에서 활용할 수 있다.
         model.addAttribute("item", item);
         return "form/editForm";
     }
