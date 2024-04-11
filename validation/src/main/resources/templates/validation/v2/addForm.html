@@ -25,34 +25,32 @@
     <form action="item.html" th:action th:object="${item}" method="post">
 
         <!-- errors의 key 중 'globalError'에 해당하는 key 값이 있으면 랜더링-->
-        <div th:if="${errors?.containsKey('globalError')}">
-            <p class="field-error" th:text="${errors['globalError']}">전체 오류 메시지</p>
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <p class="field-error" th:each="error : ${#fields.globalErrors()}" th:text="${error}">전체 오류 메시지</p>
         </div>
         <div>
             <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
-            <!--itemName 관련한 검증 실패 오류가 있으면 class 명을 'form-control field-error'로 지정한다. (입력 박스를 빨간색으로 노출)-->
+            <!--*{itemName} 관련한 검증 실패 오류가 있으면 class 명을 'form-control field-error'로 지정한다. (입력 박스를 빨간색으로 노출)-->
             <input type="text" id="itemName" th:field="*{itemName}"
-                   th:classappend="${errors?.containsKey('itemName')} ? 'form-control field-error' : 'form-control'"
-                   class="form-control" placeholder="이름을 입력하세요">
-            <div class="field-error" th:if="${errors?.containsKey('itemName')}" th:text="${errors['itemName']}">
+                   th:errorclass="field-error" class="form-control" placeholder="이름을 입력하세요">
+            <!-- th:errors="*{특정 필드}" : 특정 필드(e.g. itemName)과 관련된 필드에러가 있으면 렌더링-->
+            <div class="field-error" th:errors="*{itemName}">
                 상품명 오류
             </div>
         </div>
         <div>
             <label for="price" th:text="#{label.item.price}">가격</label>
             <input type="text" id="price" th:field="*{price}"
-                   th:classappend="${errors?.containsKey('price')} ? 'form-control field-error' : 'form-control'"
-                   class="form-control" placeholder="가격을 입력하세요">
-            <div class="field-error" th:if="${errors?.containsKey('price')}" th:text="${errors['price']}">
+                   th:errorclass="field-error" class="form-control" placeholder="가격을 입력하세요">
+            <div class="field-error" th:errors="*{price}">
                 가격 오류
             </div>
         </div>
         <div>
             <label for="quantity" th:text="#{label.item.quantity}">수량</label>
             <input type="text" id="quantity" th:field="*{quantity}"
-                   th:classappend="${errors?.containsKey('quantity')} ? 'form-control field-error' : 'form-control'"
-                   class="form-control" placeholder="수량을 입력하세요">
-            <div class="field-error" th:if="${errors?.containsKey('quantity')}" th:text="${errors['quantity']}">
+                   th:errorclass="field-error" class="form-control" placeholder="수량을 입력하세요">
+            <div class="field-error" th:errors="*{quantity}">
                 수량 오류
             </div>
         </div>

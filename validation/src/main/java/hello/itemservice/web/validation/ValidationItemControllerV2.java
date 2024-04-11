@@ -7,6 +7,9 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,47 +50,37 @@ public class ValidationItemControllerV2 {
         return "validation/v2/addForm";
     }
 
-    /**
-     * 상품 등록 검증 로직이 필요한 부분
-     * */
     @PostMapping("/add")
-    public String addItem(@ModelAttribute Item item, RedirectAttributes redirectAttributes, Model model) {
-
-        Map<String, String> errors = new HashMap<>(); // 검증 오류 결과를 보관할 객체
-
-        /**
-         * 검증 로직
-         * */
+    public String addItemV1(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        // BindingResult : item 객체의 바인딩한 결과가 담긴다. (validationItemControllerV1 클래스의 errors Map 역할)
+        // Map<String, String> errors = new HashMap<>(); // 검증 오류 결과를 보관할 객체
 
         // 특정 단일 필드 검증
-        // 상품명이 공백인 경우
         if (!StringUtils.hasText(item.getItemName())) {
-            errors.put("itemName", "상품 이름은 필수입니다.");
+            // FieldError : 스프링이 제공하는 필드 단위의 에러 처리 객체
+            bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수 입니다."));
         }
 
-        // 가격이 비어있거나(null) 허용하는 범위를 벗어나는 경우(너무 작거나 큰 경우)
         if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000){
-            errors.put("price", "가격은 1,000 ~ 1,000,000까지 허용됩니다.");
+            bindingResult.addError(new FieldError("item", "price", "가격은 1,000 ~ 1,000,000까지 허용됩니다."));
         }
 
-        // 상품 수량이 비어있거나(null) 9999개보다 큰 경우
         if(item.getQuantity() == null || item.getQuantity() >= 9999){
-            errors.put("quantity", "수량은 최대 9,999까지 허용됩니다.");
+            bindingResult.addError(new FieldError("item", "quantity", "수량은 최대 9,999까지 허용됩니다."));
         }
 
         // 특정 단일 필드가 아닌 복합 롤 검증
         if(item.getPrice() != null && item.getQuantity() != null) {
             int resultPrice = item.getPrice() * item.getQuantity();
             if(resultPrice < 10000) {
-                errors.put("globalError", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice);
+                // ObjectError : 특정 필드가 아닌 복합 롤(객체 자체) 에러 처리 객체
+                bindingResult.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
             }
         }
-
-        //if(!errors.isEmpty()){ // 부정형의 부정형인 코드는 읽기 어렵다(에러가 없음(isEmpty)이 아니면(!))
-        if(hasError(errors)) {// 부정형의 부정형인 코드는 긍정형으로 리팩토링한다.(에러가 있으면)
+        if(bindingResult.hasErrors()) {
             // 검증에 실패하면 다시 입력 폼으로 이동한다.
-            log.info("errors = {}", errors);
-            model.addAttribute("errors", errors);
+            log.info("errors = {}", bindingResult);
+            // model.addAttribute("bindingResult", bindingResult); // bindingResult 객체는 자동으로 뷰(View) 파일로 넘어가기 때문에 모델(Model)에 담는 로직은 생략한다.
             return "validation/v2/addForm";
         }
 
