@@ -52,6 +52,7 @@ public class ValidationItemControllerV2 {
 
     @PostMapping("/add")
     public String addItemV1(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        log.info("call ValidationItemControllerV1.addItemV1()");
         // BindingResult : item 객체의 바인딩한 결과가 담긴다. (validationItemControllerV1 클래스의 errors Map 역할)
         // Map<String, String> errors = new HashMap<>(); // 검증 오류 결과를 보관할 객체
 
