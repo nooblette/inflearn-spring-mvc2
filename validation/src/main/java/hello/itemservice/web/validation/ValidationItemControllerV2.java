@@ -130,7 +130,7 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-    @PostMapping("/add")
+    //@PostMapping("/add")
     public String addItemV3(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         // errors.properties 메시지 소스를 활용하도록 수정
 
@@ -156,6 +156,49 @@ public class ValidationItemControllerV2 {
             if(resultPrice < 10000) {
                 // ObjectError : 특정 필드가 아닌 복합 롤(객체 자체) 에러 처리 객체
                 bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice}, null));
+            }
+        }
+        if(bindingResult.hasErrors()) {
+            // 검증에 실패하면 다시 입력 폼으로 이동한다.
+            log.info("errors = {}", bindingResult);
+            // model.addAttribute("bindingResult", bindingResult); // bindingResult 객체는 자동으로 뷰(View) 파일로 넘어가기 때문에 모델(Model)에 담는 로직은 생략한다.
+            return "validation/v2/addForm";
+        }
+
+        // 검증 성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        // bindingResult는 자기가 검증해야할 target 객체(item 객체)를 이미 알고 있다.
+        log.info("objectName={}", bindingResult.getObjectName());
+        log.info("target={}", bindingResult.getTarget());
+
+        // 특정 단일 필드 검증
+        if (!StringUtils.hasText(item.getItemName())) {
+            // FieldError : 스프링이 제공하는 필드 단위의 에러 처리 객체
+            // new String[]{}의 두 번째 매개변수는 첫 번째 매개변수의 해당하는 메시지 값을 찾지 못할때 사용된다.
+            // 그 이후에도 못찾으면 defaultMessage 매개변수로 넘긴 값을 출력한다. (defaultMessage 값 조차 없으면 에러 발생)
+            bindingResult.rejectValue("itemName", "required");
+        }
+
+        if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000){
+            bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
+        }
+
+        if(item.getQuantity() == null || item.getQuantity() >= 9999){
+            bindingResult.rejectValue("quantity", "max", new Object[]{9999}, null);
+        }
+
+        // 특정 단일 필드가 아닌 복합 롤 검증
+        if(item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if(resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[] {10000, resultPrice}, null);
             }
         }
         if(bindingResult.hasErrors()) {
