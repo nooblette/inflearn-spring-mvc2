@@ -10,6 +10,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -179,12 +180,7 @@ public class ValidationItemControllerV2 {
         log.info("target={}", bindingResult.getTarget());
 
         // 특정 단일 필드 검증
-        if (!StringUtils.hasText(item.getItemName())) {
-            // FieldError : 스프링이 제공하는 필드 단위의 에러 처리 객체
-            // new String[]{}의 두 번째 매개변수는 첫 번째 매개변수의 해당하는 메시지 값을 찾지 못할때 사용된다.
-            // 그 이후에도 못찾으면 defaultMessage 매개변수로 넘긴 값을 출력한다. (defaultMessage 값 조차 없으면 에러 발생)
-            bindingResult.rejectValue("itemName", "required");
-        }
+        ValidationUtils.rejectIfEmpty(bindingResult, "itemName", "required");
 
         if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000){
             bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
