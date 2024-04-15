@@ -10,7 +10,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.ValidationUtils;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,6 +43,13 @@ public class ValidationItemControllerV2 {
         this.itemValidator = itemValidator;
     }
     */
+
+    @InitBinder
+    public void init(WebDataBinder webDataBinder){
+        // HTTP 요청이 올때마다 webDataBinder 객체가 생성된다.
+        // 따라서 이 메서드가 정의된 컨트룰러를 호출할때마다 항상 먼저 addValidators()를 호출하여 검증기를 webDataBinder에 넣어두고 검증 로직을 적용한다.
+        webDataBinder.addValidators(itemValidator);
+    }
 
     @GetMapping
     public String items(Model model) {
@@ -221,11 +231,28 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-    @PostMapping("/add")
+    //@PostMapping("/add")
     public String addItemV5(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         // Item 객체 검증 진행
         itemValidator.validate(item, bindingResult);
 
+        if (bindingResult.hasErrors()) {
+            // 검증에 실패하면 다시 입력 폼으로 이동한다.
+            log.info("errors = {}", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        // 검증 성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItemV6(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        // @Validated : addItemV6 메서드가 호출될 때 마다, item 클래스에 대해 검증 로직이 자동으로 수행되고 검증 결과를 BindingResult에 담아둔다.
+        // 개발자가 직접 검증 로직을 컨틀룰러에 일일이 작성할 필요가 없다
         if (bindingResult.hasErrors()) {
             // 검증에 실패하면 다시 입력 폼으로 이동한다.
             log.info("errors = {}", bindingResult);
