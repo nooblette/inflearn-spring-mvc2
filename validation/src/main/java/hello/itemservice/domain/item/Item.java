@@ -15,7 +15,7 @@ public class Item {
 
     private Long id;
 
-    @NotBlank(message = "공백을 허용하지 않는다.")
+    @NotBlank
     private String itemName;
 
     @NotNull
