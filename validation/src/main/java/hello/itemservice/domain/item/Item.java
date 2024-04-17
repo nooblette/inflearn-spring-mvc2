@@ -15,17 +15,18 @@ import lombok.Data;
 // @ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총합이 10000 이상이여야합니다.") // 오브젝트 오류는 자바로 작성하는 것을 권장
 public class Item {
 
+    @NotNull(groups = UpdateCheck.class)
     private Long id;
 
-    @NotBlank(message = "공백X")
+    @NotBlank(groups = {SaveCheck.class, UpdateCheck.class}, message = "공백X")
     private String itemName;
 
-    @NotNull
+    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
     @Range(min = 1000, max=1000000)
     private Integer price;
 
-    @NotNull
-    @Max(9999)
+    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
+    @Max(value = 9999, groups = SaveCheck.class)
     private Integer quantity;
 
     public Item() {
