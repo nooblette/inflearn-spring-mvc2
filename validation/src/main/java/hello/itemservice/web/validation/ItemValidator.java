@@ -14,7 +14,7 @@ public class ItemValidator implements Validator {
 		// 파라미터로 넘어오는 클래스(aClass)와 검증 대상 클래스 타입과(ItemValidator는 Item.class 객체 검증을 위한 Validator) 동일한지 확인 (Item == aClass)
 		// 혹은 파라미터로 넘어오는 클래스가 검증 대상 클래스의 자식 클래스인지 확인(Item == aClass(subItem))
 
-		return Item.class.isAssignableFrom(aClass); // isAssignableFrom() : 자식 클래스까지 커버 가능
+		return Item.class.isAssignableFrom(aClass); // isAssignableFrom() : 자식 클래스까지 커버 가능, aClass가 Item.class 타입(혹은 그 자식 클래스)인지 확인한다.
 	}
 
 	@Override
