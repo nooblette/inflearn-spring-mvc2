@@ -15,8 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
-import hello.itemservice.domain.item.SaveCheck;
-import hello.itemservice.domain.item.UpdateCheck;
+import hello.itemservice.web.validation.form.ItemSaveForm;
+import hello.itemservice.web.validation.form.ItemUpdateForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,35 +49,13 @@ public class ValidationItemControllerV4 {
         return "validation/v4/addForm";
     }
 
-    //@PostMapping("/add")
-    public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
-        //특정 필드 예외가 아닌 전체 예외
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
-            if (resultPrice < 10000) {
-                bindingResult.reject("totalPriceMin", new Object[] {10000, resultPrice}, null);
-            }
-        }
-
-        if (bindingResult.hasErrors()) {
-            // 검증에 실패하면 다시 입력 폼으로 이동한다.
-            log.info("errors = {}", bindingResult);
-            return "validation/v4/addForm";
-        }
-
-        // 검증 성공 로직
-        Item savedItem = itemRepository.save(item);
-        redirectAttributes.addAttribute("itemId", savedItem.getId());
-        redirectAttributes.addAttribute("status", true);
-        return "redirect:/validation/v4/items/{itemId}";
-    }
-
     @PostMapping("/add")
-    // @Validated(SaveCheck.class) : 검증 대상 객체(item 객체)에서 groups에 SaveCheck 인터페이스가 포함된 필드만 검증을 적용한다.)
-    public String addItemV2(@Validated(SaveCheck.class) @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    // @ModelAttribute("item") : 모델의 key 값을 별도로 지정해주지 않으면 자동으로 클래스명에 앞글자 소문자(itemSaveForm)를 key 값으로 지정하여 모델에 들어간다.(e.g. model.addAttribute("itemSaveForm", itemSaveForm))
+    // 이 경우 뷰 템플릿을 모두 수정(e.g. ${item} -> $[itemSaveForm})해줘야 하므로, 수정범위를 최소화하기 위해  모델의 key 값은 기존과 동일(item)하게 들어갈 수 있도록 별도로 지정한다.
+    public String addItem(@Validated @ModelAttribute("item") ItemSaveForm itemSaveForm, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         //특정 필드 예외가 아닌 전체 예외
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
+        if (itemSaveForm.getPrice() != null && itemSaveForm.getQuantity() != null) {
+            int resultPrice = itemSaveForm.getPrice() * itemSaveForm.getQuantity();
             if (resultPrice < 10000) {
                 bindingResult.reject("totalPriceMin", new Object[] {10000, resultPrice}, null);
             }
@@ -90,7 +68,8 @@ public class ValidationItemControllerV4 {
         }
 
         // 검증 성공 로직
-        Item savedItem = itemRepository.save(item);
+        // Item savedItem = itemRepository.save(itemSaveForm); // itemRepository 클래스의 save() 메서드는 Item 도메인 객체를 매개변수로 받는다.
+        Item savedItem = itemRepository.save(Item.from(itemSaveForm));
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
         return "redirect:/validation/v4/items/{itemId}";
@@ -103,31 +82,11 @@ public class ValidationItemControllerV4 {
         return "validation/v4/editForm";
     }
 
-    //@PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable Long itemId, @Validated @ModelAttribute Item item, BindingResult bindingResult) {
-        //특정 필드 예외가 아닌 전체 예외
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
-            if (resultPrice < 10000) {
-                bindingResult.reject("totalPriceMin", new Object[] {10000, resultPrice}, null);
-            }
-        }
-
-        if(bindingResult.hasErrors()){
-            log.info("errors={}", bindingResult);
-            return "validation/v4/editForm";
-        }
-
-        itemRepository.update(itemId, item);
-        return "redirect:/validation/v4/items/{itemId}";
-    }
-
     @PostMapping("/{itemId}/edit")
-    // @Validated(UpdateCheck.class) : 검증 대상 객체(item 객체)에서 groups에 UpdateCheck 인터페이스가 포함된 필드만 검증을 적용한다.)
-    public String editV2(@PathVariable Long itemId, @Validated(value = UpdateCheck.class) @ModelAttribute Item item, BindingResult bindingResult) {
+    public String edit(@PathVariable Long itemId, @Validated @ModelAttribute("item") ItemUpdateForm itemUpdateForm, BindingResult bindingResult) {
         //특정 필드 예외가 아닌 전체 예외
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
+        if (itemUpdateForm.getPrice() != null && itemUpdateForm.getQuantity() != null) {
+            int resultPrice = itemUpdateForm.getPrice() * itemUpdateForm.getQuantity();
             if (resultPrice < 10000) {
                 bindingResult.reject("totalPriceMin", new Object[] {10000, resultPrice}, null);
             }
@@ -138,7 +97,8 @@ public class ValidationItemControllerV4 {
             return "validation/v4/editForm";
         }
 
-        itemRepository.update(itemId, item);
+        // itemRepository 클래스의 update() 메서드는 Item 도메인 객체를 매개변수로 받는다.
+        itemRepository.update(itemId, Item.from(itemUpdateForm));
         return "redirect:/validation/v4/items/{itemId}";
     }
 

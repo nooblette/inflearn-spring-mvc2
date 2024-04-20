@@ -1,33 +1,28 @@
 package hello.itemservice.domain.item;
 
-// NotBlank, NotNull : Bean Validation이 표준적으로 제공, 따라서 어떤 구현체에서도 동작한다.
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
-// Range : 표준이 아님, hibernate 구현체에서만 동작한다.
-import org.hibernate.validator.constraints.Range;
-import org.hibernate.validator.constraints.ScriptAssert;
-
+import hello.itemservice.web.validation.form.ItemSaveForm;
+import hello.itemservice.web.validation.form.ItemUpdateForm;
 import lombok.Data;
 
 @Data
-// @ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총합이 10000 이상이여야합니다.") // 오브젝트 오류는 자바로 작성하는 것을 권장
 public class Item {
+    // Form 전송용 객체를 분리하면서 Item 도메인 객체의 필드에 대한 검증(Validation)은 더이상 필요가 없어진다.
 
-    @NotNull(groups = UpdateCheck.class)
     private Long id;
 
-    @NotBlank(groups = {SaveCheck.class, UpdateCheck.class}, message = "공백X")
     private String itemName;
 
-    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
-    @Range(min = 1000, max=1000000)
     private Integer price;
 
-    @NotNull(groups = {SaveCheck.class, UpdateCheck.class})
-    @Max(value = 9999, groups = SaveCheck.class)
     private Integer quantity;
+
+    public static Item from(ItemSaveForm itemSaveForm){
+        return new Item(itemSaveForm.getItemName(), itemSaveForm.getPrice(), itemSaveForm.getQuantity());
+    }
+
+    public static Item from(ItemUpdateForm itemUpdateForm){
+        return new Item(itemUpdateForm.getItemName(), itemUpdateForm.getPrice(), itemUpdateForm.getQuantity());
+    }
 
     public Item() {
     }
