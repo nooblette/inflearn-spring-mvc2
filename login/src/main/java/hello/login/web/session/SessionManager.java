@@ -40,7 +40,7 @@ public class SessionManager {
 	 * 세션 조회
 	 */
 	public Object getSession(HttpServletRequest httpServletRequest){
-		Cookie sessionCookie = findCookie(httpServletRequest, SESSION_COOKIE_NAME);
+		Cookie sessionCookie = findCookie(httpServletRequest);
 		if(sessionCookie == null){
 			return null;
 		}
@@ -52,14 +52,14 @@ public class SessionManager {
 	 * 세션 만료
 	 */
 	public void expire(HttpServletRequest httpServletRequest){
-		Cookie sessionCookie = findCookie(httpServletRequest, SESSION_COOKIE_NAME);
+		Cookie sessionCookie = findCookie(httpServletRequest);
 
 		if(sessionCookie != null) {
 			sessionStore.remove(sessionCookie.getValue());
 		}
 	}
 
-	private Cookie findCookie(HttpServletRequest httpServletRequest, String cookieName){
+	private Cookie findCookie(HttpServletRequest httpServletRequest){
 		Cookie[] cookies = httpServletRequest.getCookies();
 		if(cookies == null) {
 			return null;
