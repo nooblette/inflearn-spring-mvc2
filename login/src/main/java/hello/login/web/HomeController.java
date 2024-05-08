@@ -1,6 +1,7 @@
 package hello.login.web;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import hello.login.domain.member.Member;
 import hello.login.domain.member.MemberRepository;
@@ -43,7 +44,7 @@ public class HomeController {
         return "loginHome";
     }
 
-    @GetMapping("/")
+    //@GetMapping("/")
     public String homeLoginV2(HttpServletRequest httpServletRequest, Long memberId, Model model) {
         if(memberId == null) { // 로그인하지 않은 사용자
             return "home";
@@ -57,6 +58,27 @@ public class HomeController {
         }
 
         // 로그인한 회원이라면 loginHome 뷰를 노출한다.
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+
+    @GetMapping("/")
+    public String homeLoginV3(HttpServletRequest httpServletRequest, Long memberId, Model model) {
+        // 로그인한 사용자의 정보를 찾는것이 목적이므로 create 옵션을 false로 지정한다(세션은 메모리를 사용하기 때문에 무분별하게 생성하면 안된다)
+        HttpSession session = httpServletRequest.getSession(false);
+
+        if(session == null) { // 로그인하지 않은 사용자
+            return "home";
+        }
+
+        // 로그인한 회원에게는 회원 이름을 보여준다.
+        // 세션 저장소에 해당하는 회원(Member)가 없다면 Home 화면을 노출한다.
+        Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        if(loginMember == null){
+            return "home";
+        }
+
+        // 세션이 유지되면(로그인한 회원이라면) loginHome 뷰를 노출한다.
         model.addAttribute("member", loginMember);
         return "loginHome";
     }
