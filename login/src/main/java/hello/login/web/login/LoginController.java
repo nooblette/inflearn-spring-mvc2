@@ -97,6 +97,7 @@ public class LoginController {
 		// 로그인 성공 처리 - 서블릿이 제공하는 HttpSession을 통해 세션을 생성하고 로그인한 회원 데이터를 보관한다.
 		HttpSession session = httpServletRequest.getSession(); // getSession() : 세션이 있으면 해당 세션을 반환, 없으면 신규 세션을 생성해서 반환
 		session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember); // setAttribute() : Http Session에 로그인한 회원 정보를 보관한다.
+		//session.setMaxInactiveInterval(1800); // 특정 시간 단위로 세션 설정(1800sec, 30minute)
 		return "redirect:/";
 	}
 
