@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import hello.login.domain.login.LoginService;
 import hello.login.domain.member.Member;
@@ -77,7 +78,7 @@ public class LoginController {
 		return "redirect:/";
 	}
 
-	@PostMapping("/login")
+	//@PostMapping("/login")
 	public String loginV3(@Valid @ModelAttribute("loginForm")LoginForm form,
 						  BindingResult bindingResult,
 						  HttpServletRequest httpServletRequest,
@@ -99,6 +100,32 @@ public class LoginController {
 		session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember); // setAttribute() : Http Session에 로그인한 회원 정보를 보관한다.
 		//session.setMaxInactiveInterval(1800); // 특정 시간 단위로 세션 설정(1800sec, 30minute)
 		return "redirect:/";
+	}
+
+	@PostMapping("/login")
+	public String loginV4(@Valid @ModelAttribute("loginForm")LoginForm form,
+						  BindingResult bindingResult,
+						  @RequestParam(defaultValue = "/") String redirectURL,
+						  HttpServletRequest httpServletRequest){
+		if(bindingResult.hasErrors()){
+			return "login/loginForm";
+		}
+
+		Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+
+		// 로그인 실패
+		if(loginMember == null) {
+			bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+			return "login/loginForm";
+		}
+
+		// 로그인 성공 처리 - 서블릿이 제공하는 HttpSession을 통해 세션을 생성하고 로그인한 회원 데이터를 보관한다.
+		HttpSession session = httpServletRequest.getSession(); // getSession() : 세션이 있으면 해당 세션을 반환, 없으면 신규 세션을 생성해서 반환
+		session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember); // setAttribute() : Http Session에 로그인한 회원 정보를 보관한다.
+		// session.setMaxInactiveInterval(1800); // 특정 시간 단위로 세션 설정(1800sec, 30minute)
+
+		// LoginCheckFilter 필터에서 요청 경로에 redirectUrl를 넣어둔 경우 해당 경로로 redirect 한다.
+		return "redirect:" + redirectURL;
 	}
 
 	//@PostMapping("/logout")
