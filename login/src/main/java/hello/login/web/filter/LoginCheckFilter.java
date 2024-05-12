@@ -51,7 +51,7 @@ public class LoginCheckFilter implements Filter {
 					// 미인증 사용자일 경우 로그인 페이지로 redirect 하되,
 					// 로그인한 이후 자동으로 요청한 페이지로 다시 돌아가기 위해 redirectURL 경로를 추가한다.
 					httpServletResponse.sendRedirect("/login?redirectURL=" + requestURI);
-					return; // 미인증 사용자일 경우 이후 로직(서블릿과 컨테이너)으로 진행하지 않는다. (doFilter()를 호출하지 않는다)
+					return; // 미인증 사용자일 경우 이후 로직(서블릿과 스프링 인터셉터, 컨트룰러)으로 진행하지 않는다. (doFilter()를 호출하지 않는다)
 				}
 			}
 
