@@ -3,7 +3,6 @@ package hello.login;
 import javax.servlet.Filter;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -11,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import hello.login.web.filter.LogFilter;
 import hello.login.web.filter.LoginCheckFilter;
 import hello.login.web.interceptor.LogInterceptor;
+import hello.login.web.interceptor.LoginCheckInterceptor;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer { // 스프링 인터셉터를 등록하기 위해 WebMvcConfigurer 인터페이스를 구현한다
@@ -30,7 +30,7 @@ public class WebConfig implements WebMvcConfigurer { // 스프링 인터셉터�
 	}
 
 	// LoginCheckFilter 필터도 사용하기 위해 FilterRegistrationBean 객체를 스프링 컨테이너에 등록한다.
-	@Bean
+	//@Bean // 서블릿 필터가 아닌 스프링 인터셉터로 로그인 체크를하므로 필터는 사용하지 않기 위해 빈으로 등록하지 않는다.
 	public FilterRegistrationBean<Filter> loginCheckFilter() {
 		FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
 
@@ -48,5 +48,12 @@ public class WebConfig implements WebMvcConfigurer { // 스프링 인터셉터�
 			.order(1)
 			.addPathPatterns("/**")
 			.excludePathPatterns("/css/**", "/*.ico", "/error"); // 스프링 인터셉터를 적용하지 않을(호출하지 않을 경로) URL 패턴을 기입한다.
+
+		final String[] excludePathPatterns = {"/", "/members/add", "/login", "/logout", "/css/**", "/*.ico", "/error"};
+		registry.addInterceptor(new LoginCheckInterceptor())
+			.order(2)
+			.addPathPatterns("/**") // 모든 경로에 대해 로그인 여부 체크
+			.excludePathPatterns(excludePathPatterns); // 스프링 인터셉터를 적용하지 않을(호출하지 않을 경로) URL 패턴을 추가로 기입
+		;
 	}
 }

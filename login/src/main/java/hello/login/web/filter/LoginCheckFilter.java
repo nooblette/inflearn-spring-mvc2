@@ -22,10 +22,7 @@ public class LoginCheckFilter implements Filter {
 	private static final String[] whiteList = {"/", "/members/add", "/login", "/logout", "/css/*", "/session-info"};
 
 	// Filter 인터페이스의 init()과 destroy() 메서드는 default로 선언되어 있기때문에 구현 객체에서 반드시 오버라이딩할 필요가 없다.
-	// @Override
-	// public void init(FilterConfig filterConfig) throws ServletException {
-	// }
-
+	// 꼭 필요한 doFilter() 메서드만 구현해둔다.
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws
 		IOException,
@@ -64,10 +61,6 @@ public class LoginCheckFilter implements Filter {
 		}
 
 	}
-
-	// @Override
-	// public void destroy() {
-	// }
 
 	/***
 	 * 요청 URI가 화이트 리스트일 경우 인증 체크를 하지 않는다.
