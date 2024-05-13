@@ -1,12 +1,16 @@
 package hello.login;
 
+import java.util.List;
+
 import javax.servlet.Filter;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import hello.login.web.argumentresolver.LoginMemberArgumentResolver;
 import hello.login.web.filter.LogFilter;
 import hello.login.web.filter.LoginCheckFilter;
 import hello.login.web.interceptor.LogInterceptor;
@@ -54,6 +58,11 @@ public class WebConfig implements WebMvcConfigurer { // 스프링 인터셉터�
 			.order(2)
 			.addPathPatterns("/**") // 모든 경로에 대해 로그인 여부 체크
 			.excludePathPatterns(excludePathPatterns); // 스프링 인터셉터를 적용하지 않을(호출하지 않을 경로) URL 패턴을 추가로 기입
-		;
+	}
+
+	@Override
+	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+		// @Login 어노테이션으로 요청을 처리할 수 있는 LoginMemberArgumentResolver 클래스를 HandlerMethodArgumentResolver 목록에 등록한다.
+		argumentResolvers.add(new LoginMemberArgumentResolver());
 	}
 }

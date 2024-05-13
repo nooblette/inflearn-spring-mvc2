@@ -5,6 +5,7 @@ import javax.servlet.http.HttpSession;
 
 import hello.login.domain.member.Member;
 import hello.login.domain.member.MemberRepository;
+import hello.login.web.argumentresolver.Login;
 import hello.login.web.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,9 +85,22 @@ public class HomeController {
         return "loginHome";
     }
 
-    @GetMapping("/")
+    //@GetMapping("/")
     public String homeLoginV3Spring(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model) {
         // @SessionAttribute 애노테이션을 사용하면 세션에서 LOGIN_MEMBER 이름에 해당하는 세션을 꺼내어 loginMember로 넣어준다.
+        if(loginMember == null){
+            return "home";
+        }
+
+        // 세션이 유지되면(로그인한 회원이라면) loginHome 뷰를 노출한다.
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+
+    @GetMapping("/")
+    public String homeLoginV3ArgunemtResolver(@Login Member loginMember, Model model) {
+        log.info("homeLoginV3ArgunemtResolver");
+        // @Login 애노테이션을 사용해서(개발자가 개발한 커스텀 어노테이션) 로그인한 사용자인지 체크한다.
         if(loginMember == null){
             return "home";
         }

@@ -32,7 +32,7 @@ public class LogInterceptor implements HandlerInterceptor {
 		if(handler instanceof HandlerMethod) {
 			HandlerMethod handlerMethod = (HandlerMethod) handler; // handlerMethod : 호출할 컨트룰러 메서드의 모든 정보를 포함
 		}
-		log.info("request [{}][{}][{}]", uuid, requestURI, handler);
+		log.info("preHandle [{}][{}][{}]", uuid, requestURI, handler);
 		return true; // 이후 인터셉터를 호출한다. 더이상 인터셉터가 없을 경우 핸들러 어댑터 -> 컨트룰러를 호출한다.
 	}
 
