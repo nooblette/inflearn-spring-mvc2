@@ -14,8 +14,13 @@ public class ApiExceptionController {
 
 	@GetMapping("/api/members/{id}")
 	public MemberDto getMember(@PathVariable("id") String id) {
+		log.info("getMember, id: {}", id);
 		if("ex".equals(id)){
 			throw new RuntimeException("잘못된 사용자");
+		}
+
+		if("bad".equals(id)){
+			throw new IllegalArgumentException("잘못된 입력 값");
 		}
 
 		return new MemberDto(id, "hello " + id);
