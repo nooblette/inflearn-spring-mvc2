@@ -17,6 +17,13 @@ class ServletExceptionController {
 		throw new RuntimeException("예외 발생!");
 	}
 
+	@GetMapping("/error-400")
+	public void error400(HttpServletResponse response) throws IOException {
+		log.error("error 400");
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "400 오류!");
+	}
+
+
 	@GetMapping("/error-404")
 	public void error404(HttpServletResponse response) throws IOException {
 		log.error("error 404");
